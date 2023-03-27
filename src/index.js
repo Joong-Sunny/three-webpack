@@ -10,7 +10,11 @@ if (WEBGL.isWebGLAvailable()) {
   // scene.background = new THREE.Color(0xBB2649);
 
   //카메라생성
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const fov = 75;
+  const aspect = window.innerWidth / window.innerHeight;
+  const near = 2;
+  const far = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.z = 3;
   // const canvas = document.querySelector('#sunny-first');
 
@@ -22,14 +26,38 @@ if (WEBGL.isWebGLAvailable()) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  //바닥생성
+  const planeGeometry = new THREE.PlaneGeometry(30, 30, 1, 1);
+  const planeMaterial = new THREE.MeshStandardMaterial({
+    color: 0x888888,
+    side: THREE.DoubleSide,
+  });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotation.x = Math.PI / 2;
+  plane.position.y = -1;
+  scene.add(plane);
+  plane.receiveShadow = true;
 
-
-
-  //라이트생성
-  const pointLight = new THREE.PointLight(0xffffff, 1);
-  pointLight.position.set(0, 2, 12);
-  scene.add(pointLight);
+  //라이트생성(pointLight)
+  // const pointLight = new THREE.PointLight(0xffffff, 1);
+  // pointLight.position.set(0, 2, 12);
+  // scene.add(pointLight);
   
+  //라이트생성(ambientLight)
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+  scene.add(ambientLight);
+
+
+  //라이트생성(directionalLight)
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.7);
+  directionalLight.position.set(-1, 1.2, 1.1);
+  scene.add(directionalLight);
+  const dlHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2, 0x0000ff);
+  scene.add(dlHelper);
+  scene.add(directionalLight)
+  directionalLight.castShadow = true;
+
+
   //텍스쳐생성
   const textureLoader = new THREE.TextureLoader()
   const textureBaseColor = textureLoader.load('../static/img/brick_wall_04_diff_4k.png');
@@ -50,6 +78,7 @@ if (WEBGL.isWebGLAvailable()) {
   const obj01 = new THREE.Mesh(geometry01, material01);
   obj01.position.x = -1;
   scene.add(obj01);
+  obj01.castShadow = true;
 
 
 const geometry02 = new THREE.SphereGeometry(0.4, 0.6, 0.1);
@@ -59,6 +88,7 @@ const material02 = new THREE.MeshStandardMaterial({
 });
 const obj02 = new THREE.Mesh(geometry02, material02);
 scene.add(obj02);
+obj02.castShadow = true;
 
 
 const geometry03 = new THREE.SphereGeometry(0.3, 0.6, 0.1);
